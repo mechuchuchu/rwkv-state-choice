@@ -186,9 +186,9 @@ The starter file is [`configs/mmlu.yaml`](configs/mmlu.yaml). Important options:
 | `data.max_candidate_tokens` | `128` | Maximum tokens per candidate; longer candidates are truncated. |
 | `training.seed` | `42` | Python and PyTorch random seed. |
 | `training.device` | `cuda` | Training device. Set to `cpu` to request CPU training. |
-| `training.batch_size` | `1` | Number of examples in each forward pass. |
-| `training.eval_batch_size` | `1` | Number of examples per validation/evaluation forward pass. |
-| `training.gradient_accumulation_steps` | `16` | Micro-batches accumulated for one optimizer update. |
+| `training.batch_size` | `16` | Number of examples in each forward pass. |
+| `training.eval_batch_size` | `16` | Number of examples per validation/evaluation forward pass. |
+| `training.gradient_accumulation_steps` | `1` | Micro-batches accumulated for one optimizer update. |
 | `training.epochs` | `1` | Number of full passes over the loaded training examples. |
 | `training.state_learning_rate` | `0.0001` | AdamW learning rate for the initial recurrent state. |
 | `training.projection_learning_rate` | `0.0005` | AdamW learning rate for both projection heads. |

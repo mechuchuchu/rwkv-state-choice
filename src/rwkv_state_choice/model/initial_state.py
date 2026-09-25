@@ -41,19 +41,25 @@ class GlobalInitialState(nn.Module):
 
         for layer_idx, layer in enumerate(cache.layers):
             states = layer.recurrent_states
-            states[cache.WKV] = self.wkv[layer_idx].unsqueeze(0).expand(batch_size, -1, -1, -1)
+            states[cache.WKV] = (
+                self.wkv[layer_idx]
+                .unsqueeze(0)
+                .expand(batch_size, -1, -1, -1)
+                .clone()
+            )
             states[cache.ATT_SHIFT] = (
                 self.att_shift[layer_idx]
                 .to(dtype=activation_dtype)
                 .unsqueeze(0)
                 .expand(batch_size, -1)
+                .clone()
             )
             states[cache.FFN_SHIFT] = (
                 self.ffn_shift[layer_idx]
                 .to(dtype=activation_dtype)
                 .unsqueeze(0)
                 .expand(batch_size, -1)
+                .clone()
             )
 
         return cache
-

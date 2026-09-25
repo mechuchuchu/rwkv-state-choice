@@ -6,6 +6,7 @@ import argparse
 import json
 import random
 import shutil
+from collections import deque
 from pathlib import Path
 
 import torch
@@ -119,12 +120,14 @@ def train(config: dict) -> None:
     if epochs <= 0 or accumulation <= 0:
         raise ValueError("epochs and gradient_accumulation_steps must be positive")
 
+    recent_update_losses: deque[float] = deque(maxlen=5)
     for epoch in range(1, epochs + 1):
         model.train()
         optimizer.zero_grad(set_to_none=True)
         total_loss = 0.0
         total_examples = 0
         total_batches = len(train_loader)
+        update_loss_sum = 0.0
         progress = tqdm(train_loader, desc=f"epoch {epoch}/{epochs}")
 
         for step, cpu_batch in enumerate(progress):
@@ -136,9 +139,11 @@ def train(config: dict) -> None:
             group_size = min(accumulation, total_batches - group_start)
             (loss / group_size).backward()
 
+            batch_loss = float(loss.detach())
             batch_examples = int((batch["targets"] != -100).sum().item())
-            total_loss += float(loss.detach()) * batch_examples
+            total_loss += batch_loss * batch_examples
             total_examples += batch_examples
+            update_loss_sum += batch_loss
 
             end_of_group = (step + 1) % accumulation == 0 or step + 1 == total_batches
             if end_of_group:
@@ -149,7 +154,14 @@ def train(config: dict) -> None:
                 optimizer.step()
                 optimizer.zero_grad(set_to_none=True)
 
-            progress.set_postfix(loss=f"{float(loss.detach()):.4f}")
+                update_loss = update_loss_sum / group_size
+                recent_update_losses.append(update_loss)
+                recent_update_mean = sum(recent_update_losses) / len(recent_update_losses)
+                progress.set_postfix(
+                    update_loss=f"{update_loss:.4f}",
+                    avg5_update_loss=f"{recent_update_mean:.4f}",
+                )
+                update_loss_sum = 0.0
 
         validation_metrics = evaluate_choice_model(model, validation_loader, device)
         state_rms = {

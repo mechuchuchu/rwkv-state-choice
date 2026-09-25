@@ -87,6 +87,9 @@ The dataset has an `all` configuration for the standard `dev`, `validation`,
 and `test` splits, and a separate `auxiliary_train` configuration whose remote
 split is named `train`. The code maps the local name `auxiliary_train` to that
 Hub configuration and normalizes the examples to the project's common schema.
+At the pinned revision, auxiliary rows store their fields inside a nested
+`train` record; the adapter unwraps that record, while the standard splits
+expose the fields at the row's top level.
 See the [MMLU dataset page](https://huggingface.co/datasets/cais/mmlu) for the
 dataset card and source details.
 

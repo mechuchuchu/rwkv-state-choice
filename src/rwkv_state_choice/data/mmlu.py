@@ -29,6 +29,13 @@ def _to_example(
     dataset_id: str,
     revision: str,
 ) -> ChoiceExample:
+    # `auxiliary_train` is serialized by this dataset revision as a struct
+    # column named `train`, while the standard splits expose these fields at
+    # the row's top level.
+    nested_train_row = row.get("train")
+    if isinstance(nested_train_row, Mapping):
+        row = nested_train_row
+
     try:
         problem = row["question"]
         candidates = row["choices"]

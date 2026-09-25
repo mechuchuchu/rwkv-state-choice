@@ -1,0 +1,29 @@
+model:
+  path: /workspace/RWKV7-G1j-1.5B-20260831
+  repo_id: RWKV/RWKV7-G1j-1.5B-20260831
+  revision: 2c18b29ab7fbece25ff6112281eea0fa41fcb30f
+  dtype: bfloat16
+  projection_dim: 512
+  temperature: 0.07
+
+data:
+  dataset_id: cais/mmlu
+  revision: c30699e8356da336a370243923dbaf21066bb9fe
+  train_split: auxiliary_train
+  validation_split: validation
+  test_split: test
+  max_problem_tokens: 256
+  max_candidate_tokens: 128
+
+training:
+  seed: 42
+  device: cuda
+  batch_size: 1
+  eval_batch_size: 1
+  gradient_accumulation_steps: 16
+  epochs: 1
+  state_learning_rate: 0.0001
+  projection_learning_rate: 0.0005
+  weight_decay: 0.0
+  max_grad_norm: 1.0
+  output_dir: /workspace/rwkv-state-choice/runs/mmlu-global-state

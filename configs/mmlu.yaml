@@ -20,7 +20,7 @@ training:
   device: cuda
   batch_size: 8
   eval_batch_size: 8
-  gradient_accumulation_steps: 2
+  gradient_accumulation_steps: 16
   epochs: 1
   state_learning_rate: 0.0001
   projection_learning_rate: 0.0005
